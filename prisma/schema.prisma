@@ -1,0 +1,396 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ──── Enums ────
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ClassType {
+  WARRIOR  // Speaking focus
+  MAGE     // Writing focus
+  ROGUE    // Listening focus
+  CLERIC   // Reading focus
+}
+
+enum NodeStatus {
+  LOCKED
+  AVAILABLE
+  ACTIVE
+  MASTERED
+}
+
+enum SkillBranch {
+  SPEAKING
+  LISTENING
+  READING
+  WRITING
+  GRAMMAR
+  VOCAB
+}
+
+enum ContentType {
+  VOCAB
+  GRAMMAR
+  PHRASE
+}
+
+enum Level {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+enum StepType {
+  VOCAB
+  GRAMMAR
+  LISTENING
+  SPEAKING
+  READING
+  WRITING
+  BOSS
+}
+
+enum ItemType {
+  FRAME
+  TITLE
+  PET
+  CONSUMABLE
+  MATERIAL
+  BADGE
+}
+
+enum Rarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+enum QuestType {
+  DAILY
+  WEEKLY
+  EVENT
+  MAIN
+}
+
+// ──── User & Auth ────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  emailVerified  DateTime?
+  name           String?
+  avatarUrl      String?
+  image          String?
+  provider       String?
+  role           Role      @default(USER)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Gamification
+  level          Int       @default(1)
+  xp             BigInt    @default(0)
+  totalXp        BigInt    @default(0)
+  streak         Int       @default(0)
+  longestStreak  Int       @default(0)
+  lastActiveAt   DateTime?
+  mana           Int       @default(100)
+  maxMana        Int       @default(100)
+  class          ClassType @default(WARRIOR)
+
+  // Interests
+  interests      String[]
+
+  // Relations
+  accounts       Account[]
+  skillNodes     UserSkillNode[]
+  inventory      InventoryItem[]
+  equippedItems  EquippedItem[]
+  questProgress  UserQuest[]
+  srsCards       SrsCard[]
+  sessions       Session[]
+  partyMembers   PartyMember[]
+  guild          Guild?    @relation(fields: [guildId], references: [id])
+  guildId        String?
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ──── Skill Tree ────
+
+model SkillNode {
+  id            String      @id @default(cuid())
+  skillId       String      @unique
+  name          String
+  description   String
+  branch        SkillBranch
+  tier          Int         // 1-5 depth
+  xpCost        Int         // base XP to unlock
+  prerequisites String[]    // skillIds
+  position      Json        // {x, y} for hex grid
+  icon          String      // lucide icon name
+  color         String      // hex per branch
+
+  userNodes     UserSkillNode[]
+}
+
+model UserSkillNode {
+  id          String      @id @default(cuid())
+  userId      String
+  skillId     String
+  status      NodeStatus  @default(LOCKED)
+  progress    Float       @default(0) // 0-1
+  masteredAt  DateTime?
+
+  user        User        @relation(fields: [userId], references: [id])
+  skill       SkillNode   @relation(fields: [skillId], references: [skillId])
+
+  @@unique([userId, skillId])
+  @@index([userId])
+}
+
+// ──── SRS ────
+
+model SrsCard {
+  id            String      @id @default(cuid())
+  userId        String
+  contentId     String      // vocab/grammar item id
+  contentType   ContentType
+  easeFactor    Float       @default(2.5)
+  interval      Int         @default(0) // days
+  repetitions   Int         @default(0)
+  dueDate       DateTime    @default(now())
+  lastReviewed  DateTime?
+  lapseCount    Int         @default(0)
+
+  user          User        @relation(fields: [userId], references: [id])
+
+  @@index([userId, dueDate])
+}
+
+// ──── Lessons & Content ────
+
+model Lesson {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  description   String
+  contextTags   String[]
+  level         Level
+  xpReward      Int      @default(100)
+  manaCost      Int      @default(10)
+  estimatedMin  Int      @default(10)
+  order         Int
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  steps         LessonStep[]
+  lootTable     LootTable?
+  skillRewards  SkillReward[]
+}
+
+model LessonStep {
+  id        String   @id @default(cuid())
+  lessonId  String
+  type      StepType
+  order     Int
+  content   Json     // flexible: {vocab: [], grammar: {}, audio: "", prompt: ""}
+  xpReward  Int      @default(20)
+
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+}
+
+model SkillReward {
+  id       String @id @default(cuid())
+  lessonId String
+  skillId  String
+  xpAmount Int
+
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+}
+
+// ──── Loot System ────
+
+model LootTable {
+  id        String      @id @default(cuid())
+  lessonId  String?     @unique
+
+  drops     LootDrop[]
+  lesson    Lesson?     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+}
+
+model LootDrop {
+  id          String      @id @default(cuid())
+  lootTableId String
+  itemId      String
+  weight      Int         @default(100) // probability weight
+  minLevel    Int         @default(1)
+  maxLevel    Int?
+
+  lootTable   LootTable   @relation(fields: [lootTableId], references: [id], onDelete: Cascade)
+  item        Item        @relation(fields: [itemId], references: [id])
+}
+
+model Item {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  type        ItemType
+  rarity      Rarity
+  icon        String
+  effects     Json?
+  isCosmetic  Boolean  @default(true)
+
+  drops       LootDrop[]
+  inventory   InventoryItem[]
+  equipped    EquippedItem[]
+}
+
+model InventoryItem {
+  id         String   @id @default(cuid())
+  userId     String
+  itemId      String
+  quantity   Int      @default(1)
+  acquiredAt DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  item       Item     @relation(fields: [itemId], references: [id])
+
+  @@unique([userId, itemId])
+}
+
+model EquippedItem {
+  id        String @id @default(cuid())
+  userId    String
+  itemId    String
+  slot      String
+  equippedAt DateTime @default(now())
+
+  user      User   @relation(fields: [userId], references: [id])
+  item      Item   @relation(fields: [itemId], references: [id])
+
+  @@unique([userId, slot])
+}
+
+// ──── Quests ────
+
+model Quest {
+  id          String   @id @default(cuid())
+  type        QuestType
+  title       String
+  description String
+  requirement Json      // {type: "LESSONS_COMPLETED", count: 3, tags: ["business"]}
+  xpReward    Int
+  lootTableId String?
+  startsAt    DateTime
+  endsAt       DateTime
+  isActive    Boolean  @default(true)
+
+  userProgress UserQuest[]
+}
+
+model UserQuest {
+  id          String   @id @default(cuid())
+  userId      String
+  questId     String
+  progress    Json      // {current: 1, target: 3}
+  completedAt DateTime?
+  claimedAt   DateTime?
+
+  user        User     @relation(fields: [userId], references: [id])
+  quest       Quest    @relation(fields: [questId], references: [id])
+
+  @@unique([userId, questId])
+}
+
+// ──── Social ────
+
+model Party {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  members   PartyMember[]
+}
+
+model PartyMember {
+  id        String   @id @default(cuid())
+  userId    String
+  partyId   String
+  joinedAt  DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  party     Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@unique([userId, partyId])
+}
+
+model Guild {
+  id          String   @id @default(cuid())
+  name        String
+  tag         String   @unique
+  description String
+  createdAt   DateTime @default(now())
+  members      User[]
+}
+
+model Friend {
+  id        String   @id @default(cuid())
+  userId    String
+  friendId  String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, friendId])
+}

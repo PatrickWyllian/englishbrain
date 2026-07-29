@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+/* ──── Design Tokens (EnglishQuest) ──── */
+
+@theme inline {
+  /* Neutral scale — warm slate/stone */
+  --color-n-50: #FAFAF9;
+  --color-n-100: #F5F5F4;
+  --color-n-200: #E7E5E4;
+  --color-n-300: #D6D3D1;
+  --color-n-400: #A8A29E;
+  --color-n-500: #78716C;
+  --color-n-600: #57534E;
+  --color-n-700: #44403C;
+  --color-n-800: #292524;
+  --color-n-900: #1C1917;
+  --color-n-950: #0C0A09;
+
+  /* Accent */
+  --color-accent: #F59E0B;         /* primary — amber-500 (XP Gold) */
+  --color-accent-600: #D97706;
+  --color-accent-secondary: #06B6D4; /* cyan-500 (Mana Blue) */
+  --color-accent-accent: #A855F7;    /* purple-500 (Legendary) */
+
+  /* Semantic */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+
+  /* Brand surfaces */
+  --color-bg: #0C0A09;      /* n-950 */
+  --color-bg-card: #1C1917; /* n-900 */
+  --color-bg-hover: #292524; /* n-800 */
+  --color-border: #44403C;   /* n-700 */
+  --color-border-muted: #292524; /* n-800 */
+
+  --color-foreground: #FAFAF9; /* n-50 */
+
+  /* Typography */
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Rarity colors */
+  --color-rarity-common: #9CA3AF;
+  --color-rarity-uncommon: #22C55E;
+  --color-rarity-rare: #3B82F6;
+  --color-rarity-epic: #A855F7;
+  --color-rarity-legendary: #F59E0B;
+}
+
+/* Base */
+body {
+  background-color: var(--color-bg);
+  color: var(--color-foreground);
+  font-family: var(--font-body);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Scrollbar — dark theme subtle */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-n-700); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-n-600); }
+
+/* Focus indicators */
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 100;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  font-weight: 700;
+  border-radius: 0 0 0.75rem 0;
+  text-decoration: none;
+}
+.skip-link:focus {
+  left: 0;
+  top: 0;
+}
+
+/* Streak flame flicker */
+@keyframes flame-flicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  25% { opacity: 0.85; transform: scale(0.97) rotate(-2deg); }
+  50% { opacity: 1; transform: scale(1.05); }
+  75% { opacity: 0.9; transform: scale(0.98) rotate(1deg); }
+}
+
+.animate-flame-flicker {
+  animation: flame-flicker 1.8s ease-in-out infinite;
+}
+
+/* Mana pulse glow */
+@keyframes mana-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+.animate-mana-pulse {
+  animation: mana-pulse 2.5s ease-in-out infinite;
+}
+
+/* Mascot breathing */
+@keyframes mascot-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.animate-mascot-breathe {
+  animation: mascot-breathe 3s ease-in-out infinite;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .skip-link { display: none; }
+}

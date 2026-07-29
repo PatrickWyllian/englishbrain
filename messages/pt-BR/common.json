@@ -1,0 +1,244 @@
+{
+  "app": {
+    "title": "EnglishQuest",
+    "subtitle": "Aprenda Inglês Jogando"
+  },
+  "landing": {
+    "hero": "Domine o inglês com o que você ama.",
+    "description": "Aulas contextualizadas em séries como The Office e Friends, tech, negócios e viagens. Progrida como num RPG: ganhe XP, suba de nível, desbloqueie skills e colete loot.",
+    "cta": "Começar Quest",
+    "alreadyAccount": "Já tenho conta",
+    "features": {
+      "skillTree": {
+        "title": "Skill Tree",
+        "description": "6 branches, 30+ skills. Monte seu build ideal."
+      },
+      "xpLoot": {
+        "title": "XP & Loot",
+        "description": "Ganhe XP, suba de nível, colete itens raros e equipe seu personagem."
+      },
+      "realContext": {
+        "title": "Contexto Real",
+        "description": "Aprenda com séries, tech, negócios — conteúdo que você realmente curte."
+      }
+    }
+  },
+  "auth": {
+    "login": "Entrar",
+    "signup": "Criar conta",
+    "email": "Email",
+    "password": "Senha",
+    "welcomeBack": "Bem-vindo de volta",
+    "loginWithGithub": "Entrar com GitHub",
+    "loginWithGoogle": "Entrar com Google",
+    "orContinue": "ou continue com",
+    "noAccount": "Não tem conta?",
+    "hasAccount": "Já tem conta?"
+  },
+  "onboarding": {
+    "title": "Criar Personagem",
+    "steps": {
+      "welcome": "Boas-vindas",
+      "interests": "Interesses",
+      "placement": "Placement Test",
+      "class": "Classe",
+      "summary": "Resumo"
+    },
+    "welcome": {
+      "greeting": "Bem-vindo(a), Aventureiro(a)!",
+      "text": "Vamos montar seu personagem. Responda algumas perguntas para personalizar sua jornada de aprendizado."
+    },
+    "interests": {
+      "title": "O que você curte?",
+      "subtitle": "Escolha pelo menos 3 interesses para personalizar suas lições",
+      "search": "Buscar interesses...",
+      "selected": "selecionados"
+    },
+    "placement": {
+      "title": "Placement Test",
+      "subtitle": "Vamos descobrir seu nível de inglês",
+      "progress": "Questão {current} de {total}",
+      "result": "Seu nível estimado:"
+    },
+    "class": {
+      "title": "Escolha sua Classe",
+      "subtitle": "Sua classe define seu foco inicial. Você pode desbloquear outras depois.",
+      "warrior": {
+        "name": "Guerreiro",
+        "tagline": "Domine a fala",
+        "focus": "Foco em Speaking e conversação"
+      },
+      "rogue": {
+        "name": "Ladino",
+        "tagline": "Ouça e entenda",
+        "focus": "Foco em Listening e compreensão"
+      },
+      "mage": {
+        "name": "Mago",
+        "tagline": "Escreva com precisão",
+        "focus": "Foco em Writing e gramática"
+      },
+      "cleric": {
+        "name": "Clérigo",
+        "tagline": "Leia e absorva",
+        "focus": "Foco em Reading e vocabulário"
+      },
+      "selected": "Selecionado"
+    },
+    "summary": {
+      "title": "Personagem Criado!",
+      "level": "Nível 1",
+      "goToDashboard": "Ir para Dashboard"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "hero": {
+      "mana": "Mana",
+      "xpToday": "XP Hoje",
+      "lessons": "Lições",
+      "accuracy": "Precisão"
+    },
+    "empty": {
+      "title": "Pronto para começar sua Quest?",
+      "description": "Crie seu personagem e comece a aprender inglês com o que você gosta.",
+      "cta": "Criar Personagem"
+    },
+    "nextQuest": "Próxima Quest",
+    "skillTree": "Árvore de Skills",
+    "recentLoot": "Loot Recente",
+    "weeklyQuests": "Missões da Semana",
+    "weeklyQuestsEmpty": "Missões semanais em breve..."
+  },
+  "quests": {
+    "title": "Quest Log",
+    "recommended": "Recomendada para você",
+    "all": "Todas as Quests",
+    "xp": "XP",
+    "minutes": "min",
+    "start": "Iniciar",
+    "level": "Nível"
+  },
+  "lesson": {
+    "mana": "Mana",
+    "vocab": {
+      "title": "Vocabulário",
+      "subtitle": "Marque as palavras que você já conhece",
+      "known": "Conheço",
+      "next": "Próximo"
+    },
+    "grammar": {
+      "title": "Gramática",
+      "subtitle": "Aprenda a regra e teste seu conhecimento"
+    },
+    "boss": {
+      "title": "Boss Fight!",
+      "subtitle": "Responda antes que o tempo acabe",
+      "defeated": "Boss derrotado!",
+      "score": "Acertos: {correct}/{total}"
+    },
+    "result": {
+      "title": "Quest Completa!",
+      "xpGained": "XP Ganho",
+      "accuracy": "Precisão",
+      "manaCost": "Custo de Mana",
+      "lootDrop": "Loot Drop!",
+      "backToDashboard": "Ir para Dashboard",
+      "retry": "Refazer lição",
+      "levelUp": "Level Up!"
+    }
+  },
+  "gamification": {
+    "xp": "XP",
+    "level": "Nível",
+    "streak": "Streak",
+    "mana": "Mana",
+    "days": "dias"
+  },
+  "loot": {
+    "title": "Loot",
+    "rarity": {
+      "COMMON": "Comum",
+      "UNCOMMON": "Incomum",
+      "RARE": "Raro",
+      "EPIC": "Épico",
+      "LEGENDARY": "Lendário"
+    }
+  },
+  "skillTree": {
+    "title": "Árvore de Skills",
+    "branches": {
+      "SPEAKING": "Speaking",
+      "LISTENING": "Listening",
+      "READING": "Reading",
+      "WRITING": "Writing",
+      "GRAMMAR": "Grammar",
+      "VOCAB": "Vocabulário"
+    },
+    "status": {
+      "LOCKED": "Bloqueado",
+      "AVAILABLE": "Disponível",
+      "ACTIVE": "Ativo",
+      "MASTERED": "Dominado"
+    },
+    "unlock": "Desbloquear",
+    "xpCost": "{cost} XP"
+  },
+  "srs": {
+    "title": "Revisão",
+    "subtitle": "Revise suas cartas para fixar o conteúdo",
+    "dueToday": "Hoje",
+    "learning": "Aprendendo",
+    "mature": "Dominadas",
+    "queue": "Fila de Revisão",
+    "empty": "Nenhuma carta para revisar agora. Complete lições para adicionar cartas!",
+    "again": "Difícil",
+    "hard": "Médio",
+    "good": "Bom",
+    "easy": "Fácil",
+    "progress": "{current} de {total}",
+    "complete": "Revisão completa!",
+    "cardsAdded": "{count} cartas adicionadas"
+  },
+  "inventory": {
+    "title": "Inventário",
+    "equipped": "Equipado",
+    "equip": "Equipar",
+    "unequip": "Desequipar",
+    "empty": "Seu inventário está vazio. Complete lições para ganhar loot!",
+    "slots": {
+      "FRAME": "Moldura",
+      "TITLE": "Título",
+      "PET": "Pet",
+      "WEAPON": "Arma"
+    },
+    "tabs": {
+      "all": "Todos",
+      "equipped": "Equipados",
+      "consumables": "Consumíveis",
+      "collectibles": "Colecionáveis",
+      "materials": "Materiais"
+    }
+  },
+  "nav": {
+    "play": "Jogar",
+    "build": "Build",
+    "config": "Config",
+    "dashboard": "Dashboard",
+    "learn": "Quests",
+    "review": "Revisão",
+    "inventory": "Inventário",
+    "skillTree": "Skill Tree",
+    "log": "Quest Log"
+  },
+  "common": {
+    "loading": "Carregando...",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "finish": "Concluir",
+    "close": "Fechar",
+    "continue": "Continuar"
+  }
+}

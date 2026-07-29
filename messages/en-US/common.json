@@ -1,0 +1,244 @@
+{
+  "app": {
+    "title": "EnglishQuest",
+    "subtitle": "Learn English by Playing"
+  },
+  "landing": {
+    "hero": "Master English through the things you love.",
+    "description": "Contextualized lessons from shows like The Office and Friends, tech, business, and travel. Progress like an RPG: earn XP, level up, unlock skills, and collect loot.",
+    "cta": "Start Quest",
+    "alreadyAccount": "I already have an account",
+    "features": {
+      "skillTree": {
+        "title": "Skill Tree",
+        "description": "6 branches, 30+ skills. Build your ideal build."
+      },
+      "xpLoot": {
+        "title": "XP & Loot",
+        "description": "Earn XP, level up, collect rare items, and equip your character."
+      },
+      "realContext": {
+        "title": "Real Context",
+        "description": "Learn with shows, tech, business — content you actually enjoy."
+      }
+    }
+  },
+  "auth": {
+    "login": "Sign In",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "welcomeBack": "Welcome back",
+    "loginWithGithub": "Sign in with GitHub",
+    "loginWithGoogle": "Sign in with Google",
+    "orContinue": "or continue with",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "onboarding": {
+    "title": "Create Character",
+    "steps": {
+      "welcome": "Welcome",
+      "interests": "Interests",
+      "placement": "Placement Test",
+      "class": "Class",
+      "summary": "Summary"
+    },
+    "welcome": {
+      "greeting": "Welcome, Adventurer!",
+      "text": "Let's build your character. Answer a few questions to customize your learning journey."
+    },
+    "interests": {
+      "title": "What do you enjoy?",
+      "subtitle": "Pick at least 3 interests to personalize your lessons",
+      "search": "Search interests...",
+      "selected": "selected"
+    },
+    "placement": {
+      "title": "Placement Test",
+      "subtitle": "Let's find out your English level",
+      "progress": "Question {current} of {total}",
+      "result": "Your estimated level:"
+    },
+    "class": {
+      "title": "Choose Your Class",
+      "subtitle": "Your class defines your initial focus. You can unlock others later.",
+      "warrior": {
+        "name": "Warrior",
+        "tagline": "Master speaking",
+        "focus": "Focus on Speaking and conversation"
+      },
+      "rogue": {
+        "name": "Rogue",
+        "tagline": "Listen and understand",
+        "focus": "Focus on Listening and comprehension"
+      },
+      "mage": {
+        "name": "Mage",
+        "tagline": "Write with precision",
+        "focus": "Focus on Writing and grammar"
+      },
+      "cleric": {
+        "name": "Cleric",
+        "tagline": "Read and absorb",
+        "focus": "Focus on Reading and vocabulary"
+      },
+      "selected": "Selected"
+    },
+    "summary": {
+      "title": "Character Created!",
+      "level": "Level 1",
+      "goToDashboard": "Go to Dashboard"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "hero": {
+      "mana": "Mana",
+      "xpToday": "XP Today",
+      "lessons": "Lessons",
+      "accuracy": "Accuracy"
+    },
+    "empty": {
+      "title": "Ready to start your Quest?",
+      "description": "Create your character and start learning English with what you enjoy.",
+      "cta": "Create Character"
+    },
+    "nextQuest": "Next Quest",
+    "skillTree": "Skill Tree",
+    "recentLoot": "Recent Loot",
+    "weeklyQuests": "Weekly Quests",
+    "weeklyQuestsEmpty": "Weekly quests coming soon..."
+  },
+  "quests": {
+    "title": "Quest Log",
+    "recommended": "Recommended for you",
+    "all": "All Quests",
+    "xp": "XP",
+    "minutes": "min",
+    "start": "Start",
+    "level": "Level"
+  },
+  "lesson": {
+    "mana": "Mana",
+    "vocab": {
+      "title": "Vocabulary",
+      "subtitle": "Mark the words you already know",
+      "known": "I know this",
+      "next": "Next"
+    },
+    "grammar": {
+      "title": "Grammar",
+      "subtitle": "Learn the rule and test your knowledge"
+    },
+    "boss": {
+      "title": "Boss Fight!",
+      "subtitle": "Answer before time runs out",
+      "defeated": "Boss defeated!",
+      "score": "Score: {correct}/{total}"
+    },
+    "result": {
+      "title": "Quest Complete!",
+      "xpGained": "XP Gained",
+      "accuracy": "Accuracy",
+      "manaCost": "Mana Cost",
+      "lootDrop": "Loot Drop!",
+      "backToDashboard": "Back to Dashboard",
+      "retry": "Retry Lesson",
+      "levelUp": "Level Up!"
+    }
+  },
+  "gamification": {
+    "xp": "XP",
+    "level": "Level",
+    "streak": "Streak",
+    "mana": "Mana",
+    "days": "days"
+  },
+  "loot": {
+    "title": "Loot",
+    "rarity": {
+      "COMMON": "Common",
+      "UNCOMMON": "Uncommon",
+      "RARE": "Rare",
+      "EPIC": "Epic",
+      "LEGENDARY": "Legendary"
+    }
+  },
+  "skillTree": {
+    "title": "Skill Tree",
+    "branches": {
+      "SPEAKING": "Speaking",
+      "LISTENING": "Listening",
+      "READING": "Reading",
+      "WRITING": "Writing",
+      "GRAMMAR": "Grammar",
+      "VOCAB": "Vocabulary"
+    },
+    "status": {
+      "LOCKED": "Locked",
+      "AVAILABLE": "Available",
+      "ACTIVE": "Active",
+      "MASTERED": "Mastered"
+    },
+    "unlock": "Unlock",
+    "xpCost": "{cost} XP"
+  },
+  "srs": {
+    "title": "Review",
+    "subtitle": "Review your cards to retain what you've learned",
+    "dueToday": "Due Today",
+    "learning": "Learning",
+    "mature": "Mastered",
+    "queue": "Review Queue",
+    "empty": "No cards to review right now. Complete lessons to add cards!",
+    "again": "Hard",
+    "hard": "Medium",
+    "good": "Good",
+    "easy": "Easy",
+    "progress": "{current} of {total}",
+    "complete": "Review complete!",
+    "cardsAdded": "{count} cards added"
+  },
+  "inventory": {
+    "title": "Inventory",
+    "equipped": "Equipped",
+    "equip": "Equip",
+    "unequip": "Unequip",
+    "empty": "Your inventory is empty. Complete lessons to earn loot!",
+    "slots": {
+      "FRAME": "Frame",
+      "TITLE": "Title",
+      "PET": "Pet",
+      "WEAPON": "Weapon"
+    },
+    "tabs": {
+      "all": "All",
+      "equipped": "Equipped",
+      "consumables": "Consumables",
+      "collectibles": "Collectibles",
+      "materials": "Materials"
+    }
+  },
+  "nav": {
+    "play": "Play",
+    "build": "Build",
+    "config": "Config",
+    "dashboard": "Dashboard",
+    "learn": "Quests",
+    "review": "Review",
+    "inventory": "Inventory",
+    "skillTree": "Skill Tree",
+    "log": "Quest Log"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "close": "Close",
+    "continue": "Continue"
+  }
+}
