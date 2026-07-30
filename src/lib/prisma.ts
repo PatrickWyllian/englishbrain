@@ -9,12 +9,9 @@ const globalForPrisma = globalThis as unknown as {
 function makePrismaClient() {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
-    // Fallback for static build / missing env. Do not use in production.
-    return new PrismaClient({
-      adapter: new PrismaPg(
-        new Pool({ connectionString: "postgresql://localhost:5432/englishquest" })
-      ),
-    });
+    throw new Error(
+      "DATABASE_URL não está definida. Configure a variável de ambiente.",
+    );
   }
   return new PrismaClient({
     adapter: new PrismaPg(new Pool({ connectionString })),

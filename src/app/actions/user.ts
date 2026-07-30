@@ -161,21 +161,39 @@ interface SyncGameStateInput {
   interests?: string[];
 }
 
+const syncGameStateSchema = z.object({
+  level: z.number().int().min(1).max(100).optional(),
+  xp: z.string().regex(/^\d+$/).optional(),
+  totalXp: z.string().regex(/^\d+$/).optional(),
+  streak: z.number().int().min(0).max(365).optional(),
+  longestStreak: z.number().int().min(0).max(365).optional(),
+  mana: z.number().int().min(0).max(1000).optional(),
+  maxMana: z.number().int().min(1).max(1000).optional(),
+  class: z.enum(["WARRIOR", "MAGE", "ROGUE", "CLERIC"]).optional(),
+  interests: z.array(z.string().max(50)).max(20).optional(),
+});
+
 export async function syncGameStateToDb(state: SyncGameStateInput) {
+  const parsed = syncGameStateSchema.safeParse(state);
+  if (!parsed.success) {
+    return { error: "Dados inválidos" as const };
+  }
+
   const user = await getOrCreateUser();
   if (!user) return null;
 
   const data: Record<string, unknown> = {};
+  const s = parsed.data;
 
-  if (state.level !== undefined) data.level = state.level;
-  if (state.xp !== undefined) data.xp = BigInt(state.xp);
-  if (state.totalXp !== undefined) data.totalXp = BigInt(state.totalXp);
-  if (state.streak !== undefined) data.streak = state.streak;
-  if (state.longestStreak !== undefined) data.longestStreak = state.longestStreak;
-  if (state.mana !== undefined) data.mana = state.mana;
-  if (state.maxMana !== undefined) data.maxMana = state.maxMana;
-  if (state.class !== undefined) data.class = state.class;
-  if (state.interests !== undefined) data.interests = state.interests;
+  if (s.level !== undefined) data.level = s.level;
+  if (s.xp !== undefined) data.xp = BigInt(s.xp);
+  if (s.totalXp !== undefined) data.totalXp = BigInt(s.totalXp);
+  if (s.streak !== undefined) data.streak = s.streak;
+  if (s.longestStreak !== undefined) data.longestStreak = s.longestStreak;
+  if (s.mana !== undefined) data.mana = s.mana;
+  if (s.maxMana !== undefined) data.maxMana = s.maxMana;
+  if (s.class !== undefined) data.class = s.class;
+  if (s.interests !== undefined) data.interests = s.interests;
 
   return prisma.user.update({ where: { id: user.id }, data });
 }

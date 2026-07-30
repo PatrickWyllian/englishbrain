@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import Credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
+import { comparePassword } from "./password";
+import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
@@ -63,16 +65,20 @@ export const authConfig: NextAuthConfig = {
 
         if (!email || !password) return null;
 
+        const rateLimitKey = getRateLimitKey(email, "login");
+        const { allowed } = checkRateLimit(rateLimitKey, {
+          windowMs: 60 * 1000,
+          maxRequests: 5,
+        });
+        if (!allowed) return null;
+
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) return null;
 
-        if (process.env.NODE_ENV === "development") {
-          console.warn(
-            "[AUTH DEV] Login sem verificação de senha para:",
-            email,
-          );
-          return { id: user.id, email: user.email, name: user.name ?? "Aventureiro" };
-        }
+        if (!user.hashedPassword) return null;
+
+        const isValid = await comparePassword(password, user.hashedPassword);
+        if (!isValid) return null;
 
         return { id: user.id, email: user.email, name: user.name ?? "Aventureiro" };
       },
@@ -80,12 +86,10 @@ export const authConfig: NextAuthConfig = {
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID ?? "",
       clientSecret: process.env.AUTH_GITHUB_SECRET ?? "",
-      allowDangerousEmailAccountLinking: true,
     }),
     Google({
       clientId: process.env.AUTH_GOOGLE_ID ?? "",
       clientSecret: process.env.AUTH_GOOGLE_SECRET ?? "",
-      allowDangerousEmailAccountLinking: true,
     }),
   ],
 };

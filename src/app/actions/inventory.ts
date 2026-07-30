@@ -210,14 +210,9 @@ export async function useConsumable(itemId: string) {
     return { error: "Este efeito já está ativo" as const };
   }
 
-  await prisma.$executeRaw`
-    UPDATE "User" SET "activeEffects" = jsonb_build_array(${JSON.stringify(newEffect)}::jsonb)
-    WHERE id = ${userId}
-  `.catch(async () => {
-    await prisma.user.update({
-      where: { id: userId },
-      data: { activeEffects: [newEffect] } as Record<string, unknown>,
-    });
+  await prisma.user.update({
+    where: { id: userId },
+    data: { activeEffects: [newEffect] } as Record<string, unknown>,
   });
 
   await removeItemFromInventory(itemId, 1);

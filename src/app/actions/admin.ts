@@ -25,7 +25,7 @@ async function requireAdmin() {
 export async function getAdminStats() {
   const admin = await requireAdmin();
   if (!admin) {
-    return { error: "Não autorizado" };
+    return { error: "Acesso negado" };
   }
 
   const [totalLessons, totalUsers, activeUsers] = await Promise.all([
@@ -46,7 +46,7 @@ export async function getAdminStats() {
 export async function getLessons() {
   const admin = await requireAdmin();
   if (!admin) {
-    return { error: "Não autorizado" };
+    return { error: "Acesso negado" };
   }
 
   const lessons = await prisma.lesson.findMany({
@@ -79,7 +79,7 @@ export async function getLessons() {
 export async function getLessonById(id: string) {
   const admin = await requireAdmin();
   if (!admin) {
-    return { error: "Não autorizado" };
+    return { error: "Acesso negado" };
   }
 
   return prisma.lesson.findUnique({
@@ -119,7 +119,7 @@ interface LessonInput {
 export async function createLesson(input: LessonInput) {
   const admin = await requireAdmin();
   if (!admin) {
-    return { error: "Não autorizado" };
+    return { error: "Acesso negado" };
   }
 
   const lesson = await prisma.lesson.create({
@@ -167,7 +167,7 @@ export async function createLesson(input: LessonInput) {
 export async function updateLesson(id: string, input: LessonInput) {
   const admin = await requireAdmin();
   if (!admin) {
-    return { error: "Não autorizado" };
+    return { error: "Acesso negado" };
   }
 
   await prisma.lessonStep.deleteMany({ where: { lessonId: id } });
@@ -223,7 +223,7 @@ export async function updateLesson(id: string, input: LessonInput) {
 export async function deleteLesson(id: string) {
   const admin = await requireAdmin();
   if (!admin) {
-    return { error: "Não autorizado" };
+    return { error: "Acesso negado" };
   }
 
   await prisma.lesson.delete({ where: { id } });
@@ -233,7 +233,7 @@ export async function deleteLesson(id: string) {
 export async function getAllItems() {
   const admin = await requireAdmin();
   if (!admin) {
-    return { error: "Não autorizado" };
+    return { error: "Acesso negado" };
   }
 
   return prisma.item.findMany({ orderBy: { name: "asc" } });
@@ -242,7 +242,7 @@ export async function getAllItems() {
 export async function getAllSkillNodes() {
   const admin = await requireAdmin();
   if (!admin) {
-    return { error: "Não autorizado" };
+    return { error: "Acesso negado" };
   }
 
   return prisma.skillNode.findMany({ orderBy: { name: "asc" } });
