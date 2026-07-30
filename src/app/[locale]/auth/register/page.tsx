@@ -5,22 +5,25 @@ import { motion } from "framer-motion";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { Loader2, Mail, Lock, User } from "lucide-react";
+import { registerUser } from "@/app/actions/auth";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await signIn("credentials", {
-      email,
-      password,
-      callbackUrl: "/onboarding",
-    });
-    setIsLoading(false);
+    setError("");
+
+    const result = await registerUser({ name, email, password });
+    if (result?.error) {
+      setError(result.error);
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -44,6 +47,12 @@ export default function RegisterPage() {
         </div>
 
         <div className="rounded-2xl bg-n-900 border border-n-700 p-6 md:p-8 space-y-6">
+          {error && (
+            <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <label
@@ -103,9 +112,10 @@ export default function RegisterPage() {
                   type="password"
                   autoComplete="new-password"
                   required
+                  minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Crie uma senha"
+                  placeholder="Mínimo 8 caracteres"
                   className="w-full rounded-xl bg-n-950 border border-n-700 pl-10 pr-4 py-3 text-sm text-foreground placeholder:text-n-600 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
                 />
               </div>
@@ -130,7 +140,7 @@ export default function RegisterPage() {
             </div>
             <div className="relative flex justify-center text-xs">
               <span className="bg-n-900 px-2 text-n-500 uppercase tracking-wider">
-                ou continue com
+                ou cadastre-se com
               </span>
             </div>
           </div>
