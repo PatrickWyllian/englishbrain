@@ -18,7 +18,7 @@ export default async function ProtectedLayout({
 
   const session = await auth();
 
-  if (!session) {
+  if (!session?.user) {
     redirect(`/${locale}/auth/login`);
   }
 
