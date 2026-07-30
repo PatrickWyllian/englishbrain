@@ -16,14 +16,7 @@ export const authConfig: NextAuthConfig = {
     newUser: "/onboarding",
   },
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-      const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
-
-      if (isOnDashboard) {
-        if (isLoggedIn) return true;
-        return Response.redirect(new URL("/auth/login", nextUrl));
-      }
+    authorized({ auth }) {
       return true;
     },
     async jwt({ token, user, trigger, session }) {

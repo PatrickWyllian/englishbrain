@@ -12,11 +12,20 @@ const PUBLIC_PATHS = ["/auth/login", "/auth/register", "/onboarding", "/offline"
 
 const PROTECTED_PREFIXES = ["/dashboard", "/learn", "/shop", "/inventory", "/social", "/settings", "/skill-tree", "/profile", "/admin"];
 
+function getLocaleFromPathname(pathname: string): string {
+  const match = pathname.match(/^\/([a-z]{2}-[A-Z]{2})(\/|$)/);
+  return match ? match[1] : "pt-BR";
+}
+
+function getPathWithoutLocale(pathname: string): string {
+  const match = pathname.match(/^\/([a-z]{2}-[A-Z]{2})(\/|$)/);
+  return match ? pathname.slice(match[0].length - 1) : pathname;
+}
+
 export default async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-
-  const localeMatch = pathname.match(/^\/([a-z]{2})(\/|$)/);
-  const pathWithoutLocale = localeMatch ? pathname.slice(3) : pathname;
+  const locale = getLocaleFromPathname(pathname);
+  const pathWithoutLocale = getPathWithoutLocale(pathname);
 
   if (PUBLIC_PATHS.some((p) => pathWithoutLocale.startsWith(p))) {
     return intlMiddleware(request);
@@ -31,7 +40,7 @@ export default async function middleware(request: NextRequest) {
 
     if (!sessionToken) {
       const url = request.nextUrl.clone();
-      url.pathname = `/${localeMatch?.[1] || "pt"}/auth/login`;
+      url.pathname = `/${locale}/auth/login`;
       return NextResponse.redirect(url);
     }
 
@@ -42,13 +51,13 @@ export default async function middleware(request: NextRequest) {
         const role = payload.role as string | undefined;
         if (!role || role !== "ADMIN") {
           const url = request.nextUrl.clone();
-          url.pathname = `/${localeMatch?.[1] || "pt"}/dashboard`;
+          url.pathname = `/${locale}/dashboard`;
           return NextResponse.redirect(url);
         }
       }
     } catch {
       const url = request.nextUrl.clone();
-      url.pathname = `/${localeMatch?.[1] || "pt"}/auth/login`;
+      url.pathname = `/${locale}/auth/login`;
       return NextResponse.redirect(url);
     }
   }
