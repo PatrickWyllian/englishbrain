@@ -25,10 +25,10 @@ export default function LandingPage() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/onboarding"
+            href="/auth/register"
             className="inline-flex items-center gap-2 rounded-xl bg-accent text-n-950 px-8 py-4 font-display font-semibold text-lg hover:bg-accent-600 transition-colors"
           >
-            Começar Quest
+            Criar Conta
           </Link>
           <Link
             href="/auth/login"

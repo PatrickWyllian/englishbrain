@@ -156,10 +156,10 @@ export default function LoginPage() {
         <p className="text-center text-sm text-n-500 mt-6">
           Ainda não tem conta?{" "}
           <Link
-            href="/onboarding"
+            href="/auth/register"
             className="text-accent hover:text-accent-600 font-medium"
           >
-            Comece sua quest
+            Criar conta
           </Link>
         </p>
       </motion.div>
