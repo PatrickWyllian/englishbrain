@@ -2,7 +2,6 @@
 
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
-import { signIn } from "@/lib/auth";
 
 export async function registerUser({
   name,
@@ -34,12 +33,6 @@ export async function registerUser({
       name,
       hashedPassword,
     },
-  });
-
-  await signIn("credentials", {
-    email,
-    password,
-    redirectTo: "/onboarding",
   });
 
   return { success: true, userId: user.id };

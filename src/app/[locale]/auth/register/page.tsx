@@ -23,6 +23,12 @@ export default function RegisterPage() {
     if (result?.error) {
       setError(result.error);
       setIsLoading(false);
+    } else {
+      await signIn("credentials", {
+        email,
+        password,
+        callbackUrl: "/onboarding",
+      });
     }
   };
 
