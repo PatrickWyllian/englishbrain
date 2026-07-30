@@ -22,7 +22,7 @@ function getPathWithoutLocale(pathname: string): string {
   return match ? pathname.slice(match[0].length - 1) : pathname;
 }
 
-export default async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const locale = getLocaleFromPathname(pathname);
   const pathWithoutLocale = getPathWithoutLocale(pathname);
