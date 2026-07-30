@@ -41,3 +41,7 @@ jobs:
       - run: npm install
       - run: npx prisma generate
       - run: npm run build
+        env:
+          DATABASE_URL: "postgresql://localhost:5432/dummy"
+          AUTH_SECRET: "dummy-secret-for-build"
+          AUTH_URL: "http://localhost:3000"
