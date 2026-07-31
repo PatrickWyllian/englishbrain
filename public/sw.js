@@ -1,4 +1,4 @@
-const CACHE_NAME = "englishquest-v1";
+const CACHE_NAME = "englishquest-v2";
 const OFFLINE_URL = "/offline";
 
 const PRECACHE_ASSETS = ["/offline"];
