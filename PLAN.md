@@ -260,6 +260,7 @@ Animações refinadas, mascot falas, accessibility audit, PWA, error boundaries,
 - **UI**: Settings → seção "Professor / IA" (provedor, modelo, chave mascarada, testar conexão, salvar); `TeacherQuestCard` em `/learn` (gerar missão → desafio com dicas progressivas → correção com score/praise/versão nativa/porquê/pista).
 - **Feedback nas lições**: `WritingStep` e `SpeakingStep` corrigidos via `evaluateAnswer` com fallback offline.
 - **Skill tree 80%+**: `unlockSkillNode` exige pré-requisitos `MASTERED`; `masterSkillNode` exige progresso ≥ 0.8; novo `recordSkillProgress` (média móvel exponencial).
+- **Catálogo de missões prontas (sem LLM)**: `src/lib/teacher/catalog.ts` — 18 missões autoradas a mão (3 por nível CEFR A1–C2), mesmo formato do `teacherQuestSchema` + `modelAnswer` (resposta-modelo para correção offline). `startCatalogQuest` escolhe a próxima não concluída no CEFR do jogador (i+1) e insere em `AiQuest` com `catalogId`, sem exigir chave de API. `submitTeacherQuest` usa `modelAnswer` como target na correção por similaridade. Migration `20260731010000_add_catalog_quests` adiciona `catalogId` em `AiQuest`. UI: botão primário "Iniciar próxima missão" + "Gerar com IA" secundário + badge "Missão pronta" vs "Missão da IA". Testes `catalog.test.ts` (12).
 
 ### Variáveis de ambiente
 `LLM_ENCRYPTION_SECRET` (obrigatória para criptografar chaves de usuário) + opcionais `NVIDIA_API_KEY`, `OPENROUTER_API_KEY`, `GROQ_API_KEY` (fallback de dev).
