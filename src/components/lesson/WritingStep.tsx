@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FilePen, RotateCcw, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import type { WritingStep as WritingStepType } from "@/lib/lesson/types";
+import { useEvaluateAnswer } from "@/hooks/use-teacher";
+import type { TeacherFeedback } from "@/lib/teacher/types";
 
 interface WritingStepProps {
   step: WritingStepType;
@@ -24,6 +26,26 @@ function calculateSimilarity(a: string, b: string): number {
   }
   const maxSize = Math.max(setA.size, setB.size);
   return overlap / maxSize;
+}
+
+function localFallback(
+  attempt: string,
+  target: string,
+): TeacherFeedback {
+  const sim = calculateSimilarity(attempt, target);
+  const score = Math.round(sim * 100);
+  const mastery = score >= 80;
+  return {
+    score,
+    praise: mastery
+      ? "Excelente! Você dominou essa missão como um veterano."
+      : "Boa tentativa! Você está mais perto do que parece.",
+    native_version: target,
+    why:
+      "Compare sua resposta com a versão nativa abaixo para notar a diferença.",
+    hint: "Tente reformular focando nas palavras-chave da frase nativa.",
+    mastery,
+  };
 }
 
 function getScoreColor(score: number): { bg: string; text: string; icon: React.ReactNode } {
@@ -55,7 +77,10 @@ export function WritingStep({ step, onComplete }: WritingStepProps) {
   const [score, setScore] = useState<number | null>(null);
   const [scores, setScores] = useState<number[]>([]);
   const [showHint, setShowHint] = useState(false);
+  const [feedback, setFeedback] = useState<TeacherFeedback | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const evaluate = useEvaluateAnswer();
 
   useEffect(() => {
     textareaRef.current?.focus();
@@ -64,12 +89,25 @@ export function WritingStep({ step, onComplete }: WritingStepProps) {
   const target = step.targetSentences[currentIdx];
   const isLast = currentIdx === step.targetSentences.length - 1;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!userInput.trim()) return;
-    const similarity = calculateSimilarity(userInput, target);
-    const currentScore = Math.round(similarity * 100);
-    setScore(currentScore);
-    setScores((prev) => [...prev, currentScore]);
+    setSubmitting(true);
+    const result = await evaluate.mutateAsync({
+      prompt: step.prompt,
+      attempt: userInput,
+      target,
+      attemptCount: scores.length + 1,
+    });
+    setSubmitting(false);
+
+    const fb =
+      "error" in result
+        ? localFallback(userInput, target)
+        : result.feedback;
+
+    setFeedback(fb);
+    setScore(fb.score);
+    setScores((prev) => [...prev, fb.score]);
     setSubmitted(true);
   };
 
@@ -83,6 +121,7 @@ export function WritingStep({ step, onComplete }: WritingStepProps) {
       setSubmitted(false);
       setScore(null);
       setShowHint(false);
+      setFeedback(null);
     }
   };
 
@@ -91,6 +130,7 @@ export function WritingStep({ step, onComplete }: WritingStepProps) {
     setSubmitted(false);
     setScore(null);
     setScores((prev) => prev.slice(0, -1));
+    setFeedback(null);
   };
 
   const color = score !== null ? getScoreColor(score) : null;
@@ -180,11 +220,11 @@ export function WritingStep({ step, onComplete }: WritingStepProps) {
             <div className="flex justify-end gap-2 mt-3">
               <button
                 onClick={handleSubmit}
-                disabled={!userInput.trim()}
+                disabled={!userInput.trim() || submitting}
                 className="inline-flex items-center gap-2 rounded-xl bg-blue px-6 py-2.5 font-semibold text-n-950 hover:bg-blue/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <CheckCircle className="h-4 w-4" />
-                Enviar
+                {submitting ? "Corrigindo..." : "Enviar"}
               </button>
             </div>
 
@@ -213,6 +253,26 @@ export function WritingStep({ step, onComplete }: WritingStepProps) {
                 </p>
               </div>
             </div>
+
+            {feedback && (
+              <div className="space-y-3 text-sm">
+                {feedback.praise && (
+                  <p className="text-success">{feedback.praise}</p>
+                )}
+                {feedback.why && <p className="text-n-300">{feedback.why}</p>}
+                {feedback.hint && (
+                  <p className="text-info bg-info/10 border border-info/30 rounded-xl p-3">
+                    Dica: {feedback.hint}
+                  </p>
+                )}
+                {evaluate.data && "degraded" in evaluate.data && evaluate.data.degraded && (
+                  <p className="text-xs text-n-500">
+                    Modo offline: feedback simplificado. Configure o Professor/IA nas
+                    configurações para correção completa.
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-3">
               <button

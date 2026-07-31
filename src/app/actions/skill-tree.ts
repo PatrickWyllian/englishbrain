@@ -44,11 +44,14 @@ export async function unlockSkillNode(skillId: string) {
       where: {
         userId,
         skillId: { in: skill.prerequisites },
-        status: { in: ["ACTIVE", "MASTERED"] },
+        status: "MASTERED",
       },
     });
     if (completed.length < skill.prerequisites.length) {
-      return { error: "Pré-requisitos não atendidos" as const };
+      return {
+        error:
+          "Pré-requisitos não atendidos: domine (80%+) os nodes anteriores",
+      } as const;
     }
   }
 
@@ -85,9 +88,46 @@ export async function masterSkillNode(skillId: string) {
     return { error: "Skill não está ativa" as const };
   }
 
+  if (node.progress < 0.8) {
+    return {
+      error: "Progresso insuficiente: é preciso 80%+ de acerto consolidado" as const,
+    };
+  }
+
   const updated = await prisma.userSkillNode.update({
     where: { userId_skillId: { userId, skillId } },
     data: { status: "MASTERED", progress: 1, masteredAt: new Date() },
+  });
+
+  return { node: updated };
+}
+
+export async function recordSkillProgress(skillId: string, accuracy: number) {
+  const schema = z.object({
+    skillId: z.string().min(1),
+    accuracy: z.number().min(0).max(1),
+  });
+  const parsed = schema.safeParse({ skillId, accuracy });
+  if (!parsed.success) {
+    return { error: "Dados inválidos" as const };
+  }
+
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Não autenticado" as const };
+
+  const userId = session.user.id;
+
+  const node = await prisma.userSkillNode.findUnique({
+    where: { userId_skillId: { userId, skillId } },
+  });
+  if (!node || node.status !== "ACTIVE") {
+    return { error: "Skill não está ativa" as const };
+  }
+
+  const ema = Math.min(1, node.progress * 0.7 + parsed.data.accuracy * 0.3);
+  const updated = await prisma.userSkillNode.update({
+    where: { userId_skillId: { userId, skillId } },
+    data: { progress: ema },
   });
 
   return { node: updated };

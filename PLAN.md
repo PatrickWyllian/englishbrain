@@ -247,6 +247,31 @@ Animações refinadas, mascot falas, accessibility audit, PWA, error boundaries,
 
 ---
 
+## Implementado: Professor / IA (Mestre-Coruja)
+
+> Feature concluída em jul/2026. Usa LLMs configuráveis por usuário para gerar quests e corrigir respostas.
+
+### O que foi entregue
+- **Skill do professor**: `content/prompts/teacher.md` — identidade Mestre-Coruja, 7 princípios pedagógicos (i+1, contexto real, produção > perfeição, repetição espaçada, recall ativo, microlearning, transferência), progressão CEFR A1–C2, template de quest em 6 passos, formato de feedback (validar → versão nativa → porquê → pista), mecânicas de dopamina, guardrails e JSON de saída.
+- **Provedores LLM** (`src/lib/teacher/providers.ts`): NVIDIA (`integrate.api.nvidia.com`, modelo padrão `nvidia/nemotron-3-ultra`), OpenRouter, Groq, Custom (baseURL editável). Sem SDK — `fetch` OpenAI-compatível (`/v1/chat/completions`) com timeout e extração de JSON + validação Zod.
+- **Criptografia de chaves**: AES-256-GCM (`node:crypto`) via `LLM_ENCRYPTION_SECRET` — a chave do usuário nunca é exposta; a UI mostra apenas máscara.
+- **Persistência**: modelos Prisma `LlmSettings` (1:1 User) e `AiQuest` + enum `AiQuestStatus`; migration offline em `prisma/migrations/20260731000000_add_llm_ai_quest`.
+- **Server actions** (`src/app/actions/teacher.ts`): `getLlmSettings` (máscara, nunca a chave), `saveLlmSettings` (vazio = mantém), `testLlmConnection`, `generateTeacherQuest`, `evaluateAnswer`, `submitTeacherQuest` (XP por faixa de score + transação). Fallback local por similaridade quando o LLM não está configurado. Rate limit por usuário (20 req/min).
+- **UI**: Settings → seção "Professor / IA" (provedor, modelo, chave mascarada, testar conexão, salvar); `TeacherQuestCard` em `/learn` (gerar missão → desafio com dicas progressivas → correção com score/praise/versão nativa/porquê/pista).
+- **Feedback nas lições**: `WritingStep` e `SpeakingStep` corrigidos via `evaluateAnswer` com fallback offline.
+- **Skill tree 80%+**: `unlockSkillNode` exige pré-requisitos `MASTERED`; `masterSkillNode` exige progresso ≥ 0.8; novo `recordSkillProgress` (média móvel exponencial).
+
+### Variáveis de ambiente
+`LLM_ENCRYPTION_SECRET` (obrigatória para criptografar chaves de usuário) + opcionais `NVIDIA_API_KEY`, `OPENROUTER_API_KEY`, `GROQ_API_KEY` (fallback de dev).
+
+### Pendências
+- Vincular XP de `AiQuest` ao sync do game-store (hoje incrementa direto no banco, coerente com `claimQuestReward`).
+- Marcar `recordSkillProgress` a partir da conclusão de lições (hoje o hook existe, mas não é chamado no fluxo de lição).
+- Loot pool sorteado na conclusão da quest (hoje salvo, mas não entregue via inventário).
+- "Missão de reforço" para erros recorrentes (3x) e escudo de streak.
+
+---
+
 ## Milestones & Deliverables
 
 | Milestone | Target Date | Deliverable |

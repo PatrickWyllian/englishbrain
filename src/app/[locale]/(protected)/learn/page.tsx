@@ -7,6 +7,7 @@ import { BookOpen, Zap, Clock, ArrowRight } from "lucide-react";
 import { useGameStore } from "@/stores/game-store";
 import { LESSONS, getRecommendedLesson } from "@/lib/lesson/data";
 import type { Lesson } from "@/lib/lesson/types";
+import { TeacherQuestCard } from "@/components/teacher/TeacherQuestCard";
 
 function LessonCard({
   lesson,
@@ -113,6 +114,8 @@ export default function LearnPage() {
           </div>
           <LessonCard lesson={recommended} recommended />
         </div>
+
+        <TeacherQuestCard />
 
         <div className="space-y-4">
           <h2 className="font-display font-semibold text-foreground">

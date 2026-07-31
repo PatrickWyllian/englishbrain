@@ -4,6 +4,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mic, Check, RotateCcw, Volume2 } from "lucide-react";
 import { Mascot } from "@/components/gamification/Mascot";
+import { useEvaluateAnswer } from "@/hooks/use-teacher";
+import type { TeacherFeedback } from "@/lib/teacher/types";
 import type { SpeakingStep as SpeakingStepType } from "@/lib/lesson/types";
 
 interface SpeechRecognitionInstance {
@@ -29,11 +31,45 @@ export function SpeakingStep({ step, onComplete }: SpeakingStepProps) {
   const [transcript, setTranscript] = useState("");
   const [score, setScore] = useState(0);
   const [showHint, setShowHint] = useState(false);
+  const [feedback, setFeedback] = useState<TeacherFeedback | null>(null);
+  const [degraded, setDegraded] = useState(false);
+  const evaluate = useEvaluateAnswer();
 
   const target = step.targetSentences[currentSentence];
   const isLast = currentSentence === step.targetSentences.length - 1;
 
-  const startRecognition = () => {
+  const evaluateTranscript = async (spoken: string) => {
+    const result = await evaluate.mutateAsync({
+      prompt: step.prompt || `Pronuncie: ${target}`,
+      attempt: spoken,
+      target,
+      attemptCount: 1,
+    });
+
+    if ("error" in result) {
+      const sim = Math.round(calculateSimilarity(spoken, target) * 100);
+      setFeedback({
+        score: sim,
+        praise:
+          sim >= 80
+            ? "Excelente! Você dominou essa missão como um veterano."
+            : "Boa tentativa! Você está mais perto do que parece.",
+        native_version: target,
+        why: "Compare sua fala com a versão nativa abaixo para notar a diferença.",
+        hint: "Tente repetir a frase com mais atenção às palavras-chave.",
+        mastery: sim >= 80,
+      });
+      setScore(sim);
+      setDegraded(true);
+      return;
+    }
+
+    setFeedback(result.feedback);
+    setScore(result.feedback.score);
+    setDegraded(result.degraded);
+  };
+
+  const startRecognition = async () => {
     // Check for Web Speech API support
     const win = window as unknown as Record<string, unknown>;
     const SpeechRecognition = win.SpeechRecognition || win.webkitSpeechRecognition;
@@ -46,17 +82,17 @@ export function SpeakingStep({ step, onComplete }: SpeakingStepProps) {
 
     setStatus("listening");
     setTranscript("");
+    setFeedback(null);
 
     const recognition = new (SpeechRecognition as new () => SpeechRecognitionInstance)();
     recognition.lang = "en-US";
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event: { results: Array<Array<{ transcript: string }>> }) => {
+    recognition.onresult = async (event: { results: Array<Array<{ transcript: string }>> }) => {
       const spoken = event.results[0][0].transcript;
       setTranscript(spoken);
-      const similarity = calculateSimilarity(spoken.toLowerCase(), target.toLowerCase());
-      setScore(Math.round(similarity * 100));
+      await evaluateTranscript(spoken);
       setStatus("result");
     };
 
@@ -74,15 +110,17 @@ export function SpeakingStep({ step, onComplete }: SpeakingStepProps) {
     recognition.start();
   };
 
-  const simulateRecognition = () => {
+  const simulateRecognition = async () => {
     setStatus("listening");
     setTranscript("");
 
     // Simulate a 2-second "listening" period
-    setTimeout(() => {
+    setTimeout(async () => {
       // Simulate partial accuracy
       const simulatedSimilarity = 0.5 + Math.random() * 0.45;
-      setTranscript(target);
+      const simulated = target;
+      setTranscript(simulated);
+      await evaluateTranscript(simulated);
       setScore(Math.round(simulatedSimilarity * 100));
       setStatus("result");
     }, 2000);
@@ -100,6 +138,7 @@ export function SpeakingStep({ step, onComplete }: SpeakingStepProps) {
       setTranscript("");
       setScore(0);
       setShowHint(false);
+      setFeedback(null);
     }
   };
 
@@ -224,6 +263,26 @@ export function SpeakingStep({ step, onComplete }: SpeakingStepProps) {
               <p className="text-xs text-n-500">
                 Esperado: &ldquo;{target}&rdquo;
               </p>
+            )}
+
+            {feedback && (
+              <div className="space-y-2 text-sm max-w-md mx-auto">
+                {feedback.praise && (
+                  <p className="text-success">{feedback.praise}</p>
+                )}
+                {feedback.why && <p className="text-n-300">{feedback.why}</p>}
+                {feedback.hint && (
+                  <p className="text-info bg-info/10 border border-info/30 rounded-xl p-3">
+                    Dica: {feedback.hint}
+                  </p>
+                )}
+                {degraded && (
+                  <p className="text-xs text-n-500">
+                    Modo offline: feedback simplificado. Configure o Professor/IA nas
+                    configurações para correção completa.
+                  </p>
+                )}
+              </div>
             )}
 
             <div className="flex items-center justify-center gap-3 pt-2">

@@ -89,6 +89,11 @@ enum QuestType {
   MAIN
 }
 
+enum AiQuestStatus {
+  ACTIVE
+  COMPLETED
+}
+
 // ──── User & Auth ────
 
 model Account {
@@ -148,6 +153,8 @@ model User {
   partyMembers   PartyMember[]
   guild          Guild?    @relation(fields: [guildId], references: [id])
   guildId        String?
+  llmSettings    LlmSettings?
+  aiQuests       AiQuest[]
 }
 
 model Session {
@@ -325,7 +332,6 @@ model EquippedItem {
 }
 
 // ──── Quests ────
-
 model Quest {
   id          String   @id @default(cuid())
   type        QuestType
@@ -394,4 +400,44 @@ model Friend {
   createdAt DateTime @default(now())
 
   @@unique([userId, friendId])
+}
+
+// ──── LLM Settings (Professor / IA) ────
+
+model LlmSettings {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  provider       String   @default("nvidia")
+  model          String?
+  baseUrl        String?
+  apiKeyEncrypted String?
+  updatedAt      DateTime @updatedAt
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ──── AI Quests (geradas pelo professor) ────
+
+model AiQuest {
+  id                        String         @id @default(cuid())
+  userId                    String
+  questTitle                String
+  cefrLevel                 Level
+  theme                     String
+  narrativeHook             String
+  newStructure              String
+  challengePrompt           String
+  hintProgressive           String[]
+  xpBase                    Int            @default(50)
+  lootPool                  String[]       @default([])
+  streakMultiplierEligible  Boolean        @default(true)
+  status                    AiQuestStatus  @default(ACTIVE)
+  attempts                  Int            @default(0)
+  lastScore                 Int?
+  createdAt                 DateTime       @default(now())
+  completedAt               DateTime?
+
+  user                      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

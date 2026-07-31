@@ -31,7 +31,7 @@ const BRANCH_COL: Record<string, number> = {
 };
 
 export function SkillTree() {
-  const { nodeMap, isLoading } = useSkillTreeNodes();
+  const { nodeMap, nodes, isLoading } = useSkillTreeNodes();
   const unlockMutation = useUnlockSkillNode();
   const player = useGameStore((s) => s.player);
 
@@ -62,7 +62,7 @@ export function SkillTree() {
 
       const prereqsMet = node.prerequisites.every((pid) => {
         const pState = nodeMap.get(pid);
-        return pState === "mastered" || pState === "active";
+        return pState === "mastered";
       });
 
       if (!prereqsMet) return "locked";
@@ -355,7 +355,19 @@ export function SkillTree() {
                           </p>
                         )}
                         {state === "active" && (
-                          <p className="text-[10px] text-info">📖 Em progresso</p>
+                          <p className="text-[10px] text-info">
+                            📖 Em progresso (
+                            {Math.round(
+                              (nodes.find((n) => n.skillId === node.id)
+                                ?.progress ?? 0) * 100,
+                            )}
+                            %)
+                          </p>
+                        )}
+                        {state === "active" && (
+                          <p className="text-[10px] text-n-500">
+                            Domine com 80%+ de acerto consolidado
+                          </p>
                         )}
                         {state === "mastered" && (
                           <p className="text-[10px] text-success">✅ Dominado</p>

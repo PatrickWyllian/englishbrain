@@ -2,7 +2,12 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { getUserSkillNodes, unlockSkillNode, masterSkillNode } from "@/app/actions/skill-tree";
+import {
+  getUserSkillNodes,
+  unlockSkillNode,
+  masterSkillNode,
+  recordSkillProgress,
+} from "@/app/actions/skill-tree";
 import { useGameStore } from "@/stores/game-store";
 import type { NodeState } from "@/lib/gamification/skill-tree-data";
 
@@ -81,6 +86,19 @@ export function useMasterSkillNode() {
 
   return useMutation({
     mutationFn: (skillId: string) => masterSkillNode(skillId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SKILL_TREE_KEY });
+    },
+    onError: () => {},
+  });
+}
+
+export function useRecordSkillProgress() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ skillId, accuracy }: { skillId: string; accuracy: number }) =>
+      recordSkillProgress(skillId, accuracy),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SKILL_TREE_KEY });
     },
