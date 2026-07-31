@@ -22,6 +22,8 @@ import {
   feedbackInputSchema,
   type TeacherFeedback,
 } from "@/lib/teacher/types";
+import { findNextCatalogQuest, getCatalogQuest } from "@/lib/teacher/catalog";
+import type { CEFRLevel } from "@/types";
 import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 const LLM_RATE_LIMIT = { windowMs: 60_000, maxRequests: 20 };
@@ -237,6 +239,67 @@ export async function getActiveTeacherQuest() {
     orderBy: { createdAt: "desc" },
   });
   return quest;
+}
+
+export async function startCatalogQuest() {
+  const userId = await getAuthUserId();
+  if (!userId) return { error: "Não autenticado" as const };
+
+  if (
+    !checkRateLimit(getRateLimitKey(userId, "catalog-quest"), {
+      windowMs: 60_000,
+      maxRequests: 10,
+    }).allowed
+  ) {
+    return { error: "Muitas missões por minuto. Aguarde um pouco." as const };
+  }
+
+  const existing = await prisma.aiQuest.findFirst({
+    where: { userId, status: "ACTIVE", catalogId: { not: null } },
+    orderBy: { createdAt: "desc" },
+  });
+  if (existing) return { quest: existing };
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const cefr: CEFRLevel = user
+    ? (estimatedCefrFromLevel(user.level) as CEFRLevel)
+    : "A1";
+
+  const completed = await prisma.aiQuest.findMany({
+    where: { userId, status: "COMPLETED", catalogId: { not: null } },
+    select: { catalogId: true },
+  });
+  const completedIds = new Set(
+    completed
+      .map((row) => row.catalogId)
+      .filter((id): id is string => id !== null),
+  );
+
+  const quest = findNextCatalogQuest(cefr, completedIds);
+  if (!quest) {
+    return {
+      error: "Você já concluiu todas as missões prontas! Use o gerador de IA.",
+    } as const;
+  }
+
+  const saved = await prisma.aiQuest.create({
+    data: {
+      userId,
+      questTitle: quest.quest_title,
+      cefrLevel: quest.cefr_level as Level,
+      theme: quest.theme,
+      narrativeHook: quest.narrative_hook,
+      newStructure: quest.new_structure,
+      challengePrompt: quest.challenge_prompt,
+      hintProgressive: quest.hint_progressive,
+      xpBase: quest.xp_base,
+      lootPool: quest.loot_pool,
+      streakMultiplierEligible: quest.streak_multiplier_eligible,
+      catalogId: quest.id,
+    },
+  });
+
+  return { quest: saved };
 }
 
 function estimatedCefrFromLevel(level: number): string {
@@ -476,17 +539,22 @@ export async function submitTeacherQuest(questId: string, attempt: string) {
   });
   if (!quest) return { error: "Quest não encontrada" as const };
 
-const result = await evaluateAnswer({
-  prompt: quest.challengePrompt,
-  attempt,
-  target: quest.newStructure,
-  attemptCount: quest.attempts + 1,
-});
+  const catalogTarget =
+    quest.catalogId
+      ? getCatalogQuest(quest.catalogId)?.modelAnswer
+      : undefined;
 
-if ("error" in result) {
-  return { error: result.error };
-}
-const { feedback, degraded } = result;
+  const result = await evaluateAnswer({
+    prompt: quest.challengePrompt,
+    attempt,
+    target: catalogTarget ?? quest.newStructure,
+    attemptCount: quest.attempts + 1,
+  });
+
+  if ("error" in result) {
+    return { error: result.error };
+  }
+  const { feedback, degraded } = result;
 
   let xpAwarded = 0;
   if (feedback.score >= 60) {

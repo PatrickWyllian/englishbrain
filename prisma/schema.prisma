@@ -431,6 +431,7 @@ model AiQuest {
   xpBase                    Int            @default(50)
   lootPool                  String[]       @default([])
   streakMultiplierEligible  Boolean        @default(true)
+  catalogId                 String?
   status                    AiQuestStatus  @default(ACTIVE)
   attempts                  Int            @default(0)
   lastScore                 Int?
@@ -440,4 +441,5 @@ model AiQuest {
   user                      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+  @@index([userId, catalogId])
 }

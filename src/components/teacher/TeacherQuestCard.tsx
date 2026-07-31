@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/Input";
 import {
   useActiveTeacherQuest,
   useGenerateTeacherQuest,
+  useStartCatalogQuest,
   useSubmitTeacherQuest,
 } from "@/hooks/use-teacher";
 
@@ -21,6 +22,7 @@ function scoreColor(score: number) {
 
 export function TeacherQuestCard() {
   const { data: quest, isLoading } = useActiveTeacherQuest();
+  const startCatalog = useStartCatalogQuest();
   const generate = useGenerateTeacherQuest();
   const submit = useSubmitTeacherQuest();
 
@@ -40,7 +42,7 @@ export function TeacherQuestCard() {
   if (!quest) {
     return (
       <div className="rounded-2xl border border-accent/40 bg-accent/5 p-6">
-        <div className="flex items-start justify-between gap-4 mb-3">
+        <div className="flex items-start justify-between gap-4 mb-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-accent" />
@@ -49,18 +51,38 @@ export function TeacherQuestCard() {
               </h2>
             </div>
             <p className="text-sm text-n-400">
-              Uma quest gerada sob medida pelo Mestre-Coruja, no seu universo favorito.
+              Uma quest no seu nível, no universo do Mestre-Coruja.
             </p>
           </div>
         </div>
-        <Button
-          onClick={() => generate.mutate()}
-          disabled={generate.isPending}
-          size="lg"
-        >
-          <Wand2 className="w-4 h-4" />
-          {generate.isPending ? "Gerando missão..." : "Gerar nova missão"}
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            onClick={() => startCatalog.mutate()}
+            disabled={startCatalog.isPending}
+            size="lg"
+          >
+            <Zap className="w-4 h-4" />
+            {startCatalog.isPending
+              ? "Preparando missão..."
+              : "Iniciar próxima missão"}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => generate.mutate()}
+            disabled={generate.isPending}
+          >
+            <Wand2 className="w-4 h-4" />
+            {generate.isPending ? "Gerando..." : "Gerar com IA"}
+          </Button>
+        </div>
+        {startCatalog.isError && (
+          <p className="mt-3 text-sm text-error">
+            {startCatalog.error?.message ?? "Falha ao iniciar missão. Tente novamente."}
+          </p>
+        )}
+        {startCatalog.data?.error && (
+          <p className="mt-3 text-sm text-error">{startCatalog.data.error}</p>
+        )}
         {generate.isError && (
           <p className="mt-3 text-sm text-error">
             {generate.error?.message ?? "Falha ao gerar missão. Tente novamente."}
@@ -72,6 +94,8 @@ export function TeacherQuestCard() {
       </div>
     );
   }
+
+  const isCatalog = Boolean(quest.catalogId);
 
   const feedback = submit.data?.feedback;
 
@@ -85,6 +109,9 @@ export function TeacherQuestCard() {
           </h2>
         </div>
         <div className="flex items-center gap-2">
+          <Badge variant={isCatalog ? "success" : "info"}>
+            {isCatalog ? "Missão pronta" : "Missão da IA"}
+          </Badge>
           <Badge variant="info">{quest.cefrLevel}</Badge>
           <Badge variant="secondary">{quest.theme}</Badge>
         </div>
@@ -207,12 +234,19 @@ export function TeacherQuestCard() {
                 </Button>
               )}
               <Button
+                onClick={() => startCatalog.mutate()}
+                disabled={startCatalog.isPending}
+              >
+                <Zap className="w-4 h-4" />
+                {startCatalog.isPending ? "Preparando..." : "Próxima missão"}
+              </Button>
+              <Button
                 variant="ghost"
                 onClick={() => generate.mutate()}
                 disabled={generate.isPending}
               >
                 <Wand2 className="w-4 h-4" />
-                {generate.isPending ? "Gerando..." : "Nova missão"}
+                {generate.isPending ? "Gerando..." : "Gerar com IA"}
               </Button>
             </div>
           </motion.div>

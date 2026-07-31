@@ -8,6 +8,7 @@ import {
   testLlmConnection,
   getActiveTeacherQuest,
   generateTeacherQuest,
+  startCatalogQuest,
   evaluateAnswer,
   submitTeacherQuest,
 } from "@/app/actions/teacher";
@@ -57,6 +58,16 @@ export function useGenerateTeacherQuest() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => generateTeacherQuest(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ACTIVE_QUEST_KEY });
+    },
+  });
+}
+
+export function useStartCatalogQuest() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => startCatalogQuest(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ACTIVE_QUEST_KEY });
     },
